@@ -21,7 +21,7 @@ import matplotlib.dates as mdates
 from atproto import Client, exceptions
 
 # --- Configuration ---
-PDS_URL = os.environ.get("PDS_URL", "https://bsky.social")
+PDS_URL = os.environ.get("PDS_URL", "https://jglypt.net")
 USER_HANDLE = os.environ.get("BLUESKY_USER")
 APP_PASSWORD = os.environ.get("BLUESKY_APP_PASSWORD")
 RESULTS_DIR = "results"
