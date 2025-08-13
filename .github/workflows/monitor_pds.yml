@@ -38,9 +38,12 @@ jobs:
           PDS_URL: ${{ secrets.PDS_URL }}
           BLUESKY_USER: ${{ secrets.BLUESKY_USER }}
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: python monitor_pds.py
         
       - name: Commit and Push Results
+        # Only run this step for scheduled runs or pushes to main, not on PRs
+        if: github.event_name == 'schedule' || github.event_name == 'push'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'

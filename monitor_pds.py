@@ -199,6 +199,9 @@ def generate_graphs(results: List[Dict[str, Any]]):
 
 def main():
     """Main function to run monitoring and analysis."""
+    # This check ensures that we don't generate artifacts during PR checks, only on main/schedule.
+    is_pr_check = os.environ.get("GITHUB_EVENT_NAME") == "pull_request"
+
     monitor = PDSMonitor(PDS_URL, USER_HANDLE, APP_PASSWORD)
     
     # Run the checks
@@ -212,13 +215,17 @@ def main():
         "results": check_results
     }
 
-    # Load existing data, append new data, and save
-    all_data = load_results(RESULTS_FILE)
-    all_data.append(new_data_point)
-    save_results(RESULTS_FILE, all_data)
-    
-    # Generate new graphs
-    generate_graphs(all_data)
+    # On PRs, we only run the checks to get a status, but don't save or graph.
+    if is_pr_check:
+        logger.info("Pull Request check complete. Skipping artifact generation.")
+    else:
+        # Load existing data, append new data, and save
+        all_data = load_results(RESULTS_FILE)
+        all_data.append(new_data_point)
+        save_results(RESULTS_FILE, all_data)
+
+        # Generate new graphs
+        generate_graphs(all_data)
 
     # Print summary
     successful_checks = sum(1 for r in check_results if r['status'] == 'success')

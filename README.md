@@ -1,80 +1,218 @@
 # PDS Status Monitor
 
-A simplified, unified GitHub Actions-based monitoring system that checks the status of your AT Protocol Personal Data Server (PDS), performs various checks, and generates analysis graphs automatically.
+A GitHub Actions-based monitoring system that checks the status of your AT Protocol Personal Data Server (PDS) every 30 minutes and performs various AT Protocol requests to test functionality.
 
 ## Features
 
-- **Automated Monitoring**: Runs every 30 minutes via GitHub Actions.
-- **Unified Script**: A single Python script handles monitoring, data storage, and analysis.
-- **Optional Authenticated Checks**: If you provide credentials, it runs additional tests that require login.
-- **On-the-Fly Analysis**: Automatically regenerates uptime and endpoint success graphs after each run.
-- **Simplified Data Storage**: All results are stored in a single, easy-to-parse JSON file.
+- **Automated Monitoring**: Runs every 30 minutes via GitHub Actions
+- **Comprehensive Testing**: Tests AT Protocol endpoints and server health
+- **Data Storage**: Saves results as JSON files for easy analysis
+- **Visualization Tools**: Generate graphs, calendar views, and reports
+- **Configurable**: Easy to adapt for any PDS and user handle
 
 ## Quick Start
 
-### 1. Fork the Repository
+### 1. Configuration
 
-Fork this repository to your own GitHub account.
+Edit the configuration in `monitor_pds.py`:
 
-### 2. Configure via GitHub Secrets
+```python
+# Configuration - Change these values for your PDS
+PDS_URL = "https://jglypt.net"  # Your PDS URL
+USER_HANDLE = "@j4ck.xyz"       # Your AT Protocol handle
+```
 
-Configuration is handled by GitHub repository secrets. This keeps your credentials secure.
+### 2. Manual Testing
 
-1.  In your forked repository, go to `Settings` > `Secrets and variables` > `Actions`.
-2.  Create the following secrets:
+Test the monitoring script locally:
 
-| Secret Name             | Description                                                                                             | Required |
-| ----------------------- | ------------------------------------------------------------------------------------------------------- | -------- |
-| `PDS_URL`               | The full URL of your PDS (e.g., `https://my-pds.com`). Defaults to `https://bsky.social` if not set.    | No       |
-| `BLUESKY_USER`          | Your Bluesky username/handle (e.g., `my-handle.bsky.social`). **Required for authenticated checks.**      | No       |
-| `BLUESKY_APP_PASSWORD`  | An app password for your Bluesky account. **Required for authenticated checks.**                          | No       |
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-**Note:** To enable authenticated checks, you must provide both `BLUESKY_USER` and `BLUESKY_APP_PASSWORD`. Otherwise, the monitor will only perform unauthenticated checks.
+# Run a single monitoring check
+python monitor_pds.py
+```
+
+This will:
+- Check your PDS status
+- Perform AT Protocol requests
+- Save results to `results/pds_monitor_YYYYMMDD_HHMMSS.json`
+- Display a summary in the terminal
 
 ### 3. Enable GitHub Actions
 
-The monitoring will automatically start running every 30 minutes. You can also trigger it manually:
+The monitoring will automatically start running every 30 minutes once you push to the main branch. You can also trigger it manually:
 
-1.  Go to your repository on GitHub and click the **Actions** tab.
-2.  Select the **Monitor PDS Status** workflow.
-3.  Click **Run workflow** to trigger a manual run.
+1. Go to your repository on GitHub
+2. Click on the "Actions" tab
+3. Select "Monitor PDS Status" workflow
+4. Click "Run workflow" to trigger manually
 
-## How It Works
+## Data Analysis
 
-- Every 30 minutes, the GitHub Action runs the `monitor_pds.py` script.
-- The script performs a series of checks against your PDS.
-- A new data point, including the results of the checks, is appended to `results/pds_monitoring_data.json`.
-- The script then regenerates the analysis graphs in the `analysis/` directory based on the complete dataset.
-- The workflow commits the updated data file and graphs back to your repository.
+### Generate Visualizations
 
-## Viewing Results
+After collecting some monitoring data, generate visualizations:
 
-- **Raw Data**: The full history of monitoring checks is in `results/pds_monitoring_data.json`.
-- **Visualizations**: Check the `analysis/` directory for the latest graphs:
-    - `uptime_graph.png`: Shows PDS uptime and response times.
-    - `endpoint_analysis.png`: Shows the success rate for each monitored endpoint.
+```bash
+# Install analysis dependencies
+pip install -r requirements.txt
+
+# Generate all visualizations and reports
+python analyze_results.py
+```
+
+This creates several files in the `analysis/` directory:
+
+- **`uptime_graph.png`**: Shows PDS uptime and response times over time
+- **`success_rate_graph.png`**: Shows AT Protocol request success rates
+- **`calendar_heatmap.png`**: Calendar view of daily uptime percentages
+- **`endpoint_analysis.png`**: Success rates for each AT Protocol endpoint
+- **`summary_report.txt`**: Text summary of all monitoring data
+
+### Viewing Results
+
+#### Graph View
+The uptime graph shows:
+- PDS online/offline status over time
+- Response times for each check
+- Clear visualization of downtime periods
+
+#### Calendar View
+The calendar heatmap shows:
+- Daily uptime percentages
+- Color-coded days (green = high uptime, red = low uptime)
+- Weekly patterns and trends
+
+#### Endpoint Analysis
+The endpoint analysis shows:
+- Success rates for each AT Protocol endpoint
+- Which endpoints are most reliable
+- Potential issues with specific functionality
+
+### Downloading Data
+
+All monitoring results are stored as JSON files in the `results/` directory. You can:
+
+1. **Download individual files**: Click on any JSON file in the GitHub interface
+2. **Download all results**: Use the "Code" → "Download ZIP" option
+3. **Clone the repository**: `git clone <your-repo-url>`
+
+## Data Format
+
+Each monitoring result is saved as a JSON file with this structure:
+
+```json
+{
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "pds_url": "https://jglypt.net",
+  "user_handle": "@j4ck.xyz",
+  "pds_status": {
+    "status": "online",
+    "response_time": 0.245,
+    "error": null,
+    "details": { ... }
+  },
+  "atproto_requests": [
+    {
+      "endpoint": "server_describe",
+      "status": "success",
+      "response_time": 0.123,
+      "response_code": 200
+    }
+  ],
+  "summary": {
+    "total_requests": 10,
+    "successful_requests": 1,
+    "success_rate": 10.0,
+    "pds_online": true
+  }
+}
+```
+
+## Understanding the Results
+
+### Expected Behavior
+
+- **PDS Status**: Should show "online" if your PDS is working
+- **AT Protocol Requests**: Most endpoints will return 401 (Unauthorized) because they require authentication
+- **Server Describe**: This endpoint should always work and return 200
+- **Response Times**: Should be under 1 second for good performance
+
+### What 401 Errors Mean
+
+401 (Unauthorized) errors are **normal and expected** for most AT Protocol endpoints when making unauthenticated requests. This indicates:
+- Your PDS is online and responding
+- The endpoints are working correctly
+- Authentication is properly configured
+
+### What to Monitor
+
+- **PDS Status**: Ensure it stays "online"
+- **Response Times**: Watch for performance degradation
+- **Server Describe**: This should always return 200
+- **Overall Uptime**: Track percentage of successful checks
 
 ## Customization
 
+### Adding New Endpoints
+
+To test additional AT Protocol endpoints, edit the `endpoints` list in `monitor_pds.py`:
+
+```python
+endpoints = [
+    # ... existing endpoints ...
+    {
+        'name': 'your_new_endpoint',
+        'url': f"{self.pds_url}/xrpc/your.endpoint.path",
+        'params': {'param1': 'value1'}
+    }
+]
+```
+
 ### Changing Monitoring Frequency
 
-Edit `.github/workflows/monitor_pds.yml` and modify the `cron` schedule:
+Edit `.github/workflows/monitor_pds.yml`:
 
 ```yaml
 schedule:
   # Run every 15 minutes
   - cron: '*/15 * * * *'
+  # Run every hour
+  - cron: '0 * * * *'
 ```
 
-### Adding New Checks
+### Custom Analysis
 
-Modify the `run_all_checks` method in `monitor_pds.py` to add new client calls.
+Modify `analyze_results.py` to create custom visualizations or add new analysis functions.
 
 ## Troubleshooting
 
-- **Actions not running**: Ensure you have enabled GitHub Actions for your repository.
-- **Login failed errors**: Double-check your `BLUESKY_USER` and `BLUESKY_APP_PASSWORD` secrets. Ensure the app password is correct and has the necessary permissions.
-- **Commit errors**: The workflow needs `write` permissions for `contents` to push results back to the repository. This is configured in `monitor_pds.yml` by default.
+### Common Issues
+
+1. **PDS not responding**: Check if your PDS is running and accessible
+2. **Authentication errors**: Most endpoints require authentication (this is normal)
+3. **Rate limiting**: The script includes delays to avoid overwhelming your PDS
+
+### Debug Mode
+
+Run with verbose logging:
+
+```bash
+python -u monitor_pds.py 2>&1 | tee monitoring.log
+```
+
+### Check GitHub Actions
+
+If the automated monitoring isn't working:
+1. Check the "Actions" tab in your GitHub repository
+2. Look for any error messages in the workflow logs
+3. Ensure the repository has the necessary permissions
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!
 
 ## License
 
