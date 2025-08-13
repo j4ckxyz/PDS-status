@@ -1,0 +1,111 @@
+{
+  "timestamp": "2025-08-13T21:04:50.089702+00:00",
+  "pds_url": "https://jglypt.net",
+  "user_handle": "@j4ck.xyz",
+  "pds_status": {
+    "timestamp": "2025-08-13T21:04:48.725747+00:00",
+    "pds_url": "https://jglypt.net",
+    "status": "error",
+    "response_time": 0.073,
+    "error": "HTTP 403",
+    "details": {}
+  },
+  "atproto_requests": [
+    {
+      "timestamp": "2025-08-13T21:04:48.799352+00:00",
+      "endpoint": "server_describe",
+      "url": "https://jglypt.net/xrpc/com.atproto.server.describeServer",
+      "status": "error",
+      "response_time": 0.053,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:48.852703+00:00",
+      "endpoint": "server_health",
+      "url": "https://jglypt.net/xrpc/com.atproto.server.getHealth",
+      "status": "error",
+      "response_time": 0.031,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:48.883618+00:00",
+      "endpoint": "get_profile",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getProfile",
+      "status": "error",
+      "response_time": 0.339,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:49.222569+00:00",
+      "endpoint": "get_author_feed",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getAuthorFeed",
+      "status": "error",
+      "response_time": 0.048,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:49.270251+00:00",
+      "endpoint": "get_suggestions",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getSuggestions",
+      "status": "error",
+      "response_time": 0.053,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:49.323629+00:00",
+      "endpoint": "search_posts",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.searchPosts",
+      "status": "error",
+      "response_time": 0.038,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:49.361453+00:00",
+      "endpoint": "get_follows",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getFollows",
+      "status": "error",
+      "response_time": 0.04,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:49.401504+00:00",
+      "endpoint": "get_followers",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getFollowers",
+      "status": "error",
+      "response_time": 0.324,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:49.725078+00:00",
+      "endpoint": "get_lists",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getLists",
+      "status": "error",
+      "response_time": 0.038,
+      "error": "HTTP 403",
+      "response_code": 403
+    },
+    {
+      "timestamp": "2025-08-13T21:04:49.762880+00:00",
+      "endpoint": "get_popular",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getPopular",
+      "status": "error",
+      "response_time": 0.327,
+      "error": "HTTP 403",
+      "response_code": 403
+    }
+  ],
+  "summary": {
+    "total_requests": 10,
+    "successful_requests": 0,
+    "success_rate": 0.0,
+    "pds_online": false
+  }
+}
