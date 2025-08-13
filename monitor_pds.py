@@ -1,249 +1,237 @@
 #!/usr/bin/env python3
 """
-AT Protocol PDS Status Monitor - Simple Version
+AT Protocol PDS Status Monitor
 
-This script monitors the status of an AT Protocol Personal Data Server (PDS)
-and performs basic AT Protocol requests that don't require authentication.
-
-Configuration:
-- PDS_URL: The URL of your PDS (default: https://jglypt.net)
-- USER_HANDLE: Your AT Protocol handle (default: @j4ck.xyz)
-
-Usage:
-    python monitor_pds_simple.py
+This script monitors the status of an AT Protocol Personal Data Server (PDS),
+performs AT Protocol requests (authenticated or unauthenticated), and generates
+updated analysis graphs with each run.
 """
 
-import requests
+import os
 import json
 import time
-import os
-from datetime import datetime, timezone
-from typing import Dict, List, Any
+import glob
 import logging
+from datetime import datetime, timezone
+from typing import Dict, List, Any, Optional
 
-# Configuration - Change these values for your PDS
-PDS_URL = "https://jglypt.net"
-USER_HANDLE = "@j4ck.xyz"
+import requests
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from atproto import Client, exceptions
 
-# Set up logging
+# --- Configuration ---
+PDS_URL = os.environ.get("PDS_URL", "https://bsky.social")
+USER_HANDLE = os.environ.get("BLUESKY_USER")
+APP_PASSWORD = os.environ.get("BLUESKY_APP_PASSWORD")
+RESULTS_DIR = "results"
+ANALYSIS_DIR = "analysis"
+RESULTS_FILE = os.path.join(RESULTS_DIR, "pds_monitoring_data.json")
+
+# --- Set up logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class PDSMonitor:
-    def __init__(self, pds_url: str, user_handle: str):
+    """
+    Monitors a PDS, performs checks, and saves results.
+    """
+    def __init__(self, pds_url: str, user_handle: Optional[str] = None, app_password: Optional[str] = None):
         self.pds_url = pds_url.rstrip('/')
         self.user_handle = user_handle
-        self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'PDS-Monitor/1.0',
-            'Accept': 'application/json'
-        })
-        
-    def check_pds_status(self) -> Dict[str, Any]:
-        """Check basic PDS status and health"""
-        result = {
-            'timestamp': datetime.now(timezone.utc).isoformat(),
-            'pds_url': self.pds_url,
-            'status': 'unknown',
-            'response_time': None,
-            'error': None,
-            'details': {}
-        }
-        
-        try:
-            start_time = time.time()
-            response = self.session.get(f"{self.pds_url}/xrpc/com.atproto.server.describeServer", timeout=10)
-            response_time = time.time() - start_time
-            
-            result['response_time'] = round(response_time, 3)
-            
-            if response.status_code == 200:
-                result['status'] = 'online'
-                try:
-                    server_info = response.json()
-                    result['details'] = {
-                        'available_user_domains': server_info.get('availableUserDomains', []),
-                        'invite_code_required': server_info.get('inviteCodeRequired', False),
-                        'links': server_info.get('links', {})
-                    }
-                except json.JSONDecodeError:
-                    result['details'] = {'raw_response': response.text[:500]}
-            else:
-                result['status'] = 'error'
-                result['error'] = f"HTTP {response.status_code}"
-                
-        except requests.exceptions.RequestException as e:
-            result['status'] = 'offline'
-            result['error'] = str(e)
-            
-        return result
-    
-    def perform_atproto_requests(self) -> List[Dict[str, Any]]:
-        """Perform basic AT Protocol requests that don't require authentication"""
-        requests_results = []
-        
-        # Only test endpoints that should work without authentication
-        endpoints = [
-            {
-                'name': 'server_describe',
-                'url': f"{self.pds_url}/xrpc/com.atproto.server.describeServer",
-                'params': {}
-            },
-            {
-                'name': 'server_health',
-                'url': f"{self.pds_url}/xrpc/com.atproto.server.getHealth",
-                'params': {}
-            },
-            {
-                'name': 'get_profile',
-                'url': f"{self.pds_url}/xrpc/app.bsky.actor.getProfile",
-                'params': {'actor': self.user_handle}
-            },
-            {
-                'name': 'get_author_feed',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getAuthorFeed",
-                'params': {'actor': self.user_handle, 'limit': 5}
-            },
-            {
-                'name': 'get_suggestions',
-                'url': f"{self.pds_url}/xrpc/app.bsky.actor.getSuggestions",
-                'params': {'limit': 5}
-            },
-            {
-                'name': 'search_posts',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.searchPosts",
-                'params': {'q': 'test', 'limit': 5}
-            },
-            {
-                'name': 'get_follows',
-                'url': f"{self.pds_url}/xrpc/app.bsky.graph.getFollows",
-                'params': {'actor': self.user_handle, 'limit': 5}
-            },
-            {
-                'name': 'get_followers',
-                'url': f"{self.pds_url}/xrpc/app.bsky.graph.getFollowers",
-                'params': {'actor': self.user_handle, 'limit': 5}
-            },
-            {
-                'name': 'get_lists',
-                'url': f"{self.pds_url}/xrpc/app.bsky.graph.getLists",
-                'params': {'actor': self.user_handle, 'limit': 5}
-            },
-            {
-                'name': 'get_popular',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getPopular",
-                'params': {'limit': 5}
-            }
-        ]
-        
-        for endpoint in endpoints:
-            result = {
-                'timestamp': datetime.now(timezone.utc).isoformat(),
-                'endpoint': endpoint['name'],
-                'url': endpoint['url'],
-                'status': 'unknown',
-                'response_time': None,
-                'error': None,
-                'response_code': None
-            }
-            
-            try:
-                start_time = time.time()
-                response = self.session.get(endpoint['url'], params=endpoint.get('params', {}), timeout=10)
-                response_time = time.time() - start_time
-                
-                result['response_time'] = round(response_time, 3)
-                result['response_code'] = response.status_code
-                
-                if response.status_code == 200:
-                    result['status'] = 'success'
-                elif response.status_code == 401:
-                    result['status'] = 'unauthorized'
-                elif response.status_code == 404:
-                    result['status'] = 'not_found'
-                else:
-                    result['status'] = 'error'
-                    result['error'] = f"HTTP {response.status_code}"
-                    
-            except requests.exceptions.RequestException as e:
-                result['status'] = 'failed'
-                result['error'] = str(e)
-            
-            requests_results.append(result)
-            
-        return requests_results
-    
-    def run_monitoring(self) -> Dict[str, Any]:
-        """Run complete monitoring check"""
-        logger.info(f"Starting PDS monitoring for {self.pds_url}")
-        
-        # Check basic PDS status
-        status_result = self.check_pds_status()
-        logger.info(f"PDS Status: {status_result['status']}")
-        
-        # Perform AT Protocol requests
-        requests_results = self.perform_atproto_requests()
-        successful_requests = sum(1 for r in requests_results if r['status'] == 'success')
-        logger.info(f"AT Protocol Requests: {successful_requests}/{len(requests_results)} successful")
-        
-        # Compile final results
-        monitoring_result = {
-            'timestamp': datetime.now(timezone.utc).isoformat(),
-            'pds_url': self.pds_url,
-            'user_handle': self.user_handle,
-            'pds_status': status_result,
-            'atproto_requests': requests_results,
-            'summary': {
-                'total_requests': len(requests_results),
-                'successful_requests': successful_requests,
-                'success_rate': round(successful_requests / len(requests_results) * 100, 2) if requests_results else 0,
-                'pds_online': status_result['status'] == 'online'
-            }
-        }
-        
-        return monitoring_result
+        self.app_password = app_password
+        self.client = self._get_client()
 
-def save_results(results: Dict[str, Any], output_dir: str = "results"):
-    """Save monitoring results to file"""
-    os.makedirs(output_dir, exist_ok=True)
+    def _get_client(self) -> Client:
+        """Creates a new atproto Client and optionally logs in."""
+        client = Client(base_url=self.pds_url)
+        if self.user_handle and self.app_password:
+            try:
+                logger.info(f"Attempting to log in as {self.user_handle}...")
+                client.login(self.user_handle, self.app_password)
+                logger.info("Login successful.")
+            except exceptions.AtProtocolError as e:
+                logger.error(f"Login failed: {e}")
+        else:
+            logger.info("No credentials provided, proceeding with unauthenticated client.")
+        return client
+
+    def _run_check(self, check_name: str, func, **kwargs) -> Dict[str, Any]:
+        """Helper to run a single check and capture its result."""
+        start_time = time.time()
+        result = {
+            "endpoint": check_name,
+            "status": "failed",
+            "response_time": None,
+            "response_code": None,
+            "error": None
+        }
+        try:
+            response = func(**kwargs)
+            result["status"] = "success"
+            # Assuming the client gives us a dict-like object
+            if hasattr(response, 'to_dict'):
+                # Clean up the response if needed
+                pass
+        except exceptions.AtProtocolError as e:
+            result["error"] = str(e)
+            if hasattr(e, 'response') and hasattr(e.response, 'status_code'):
+                result["response_code"] = e.response.status_code
+        except Exception as e:
+            result["error"] = str(e)
+        finally:
+            result["response_time"] = round(time.time() - start_time, 3)
+
+        status_emoji = "🟢" if result['status'] == 'success' else "🔴"
+        logger.info(f"{status_emoji} {check_name}: {result['status']} ({result['response_time']}s)")
+        return result
+
+    def run_all_checks(self) -> List[Dict[str, Any]]:
+        """Runs all monitoring checks."""
+        logger.info(f"Starting checks for PDS at {self.pds_url}")
+        results = []
+
+        # --- Unauthenticated requests ---
+        results.append(self._run_check("describe_server", self.client.com.atproto.server.describe_server))
+        if self.user_handle:
+            results.append(self._run_check("get_profile", self.client.app.bsky.actor.get_profile, actor=self.user_handle))
+            results.append(self._run_check("get_author_feed", self.client.app.bsky.feed.get_author_feed, actor=self.user_handle, limit=5))
+
+        # --- Authenticated requests ---
+        if self.client.me:
+            results.append(self._run_check("get_session", self.client.com.atproto.server.get_session))
+            results.append(self._run_check("get_timeline", self.client.app.bsky.feed.get_timeline, limit=5))
+
+        return results
+
+def load_results(filepath: str) -> List[Dict[str, Any]]:
+    """Loads monitoring results from the JSON file."""
+    if not os.path.exists(filepath):
+        return []
+    try:
+        with open(filepath, 'r') as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        logger.error(f"Error loading results file {filepath}: {e}")
+        return []
+
+def save_results(filepath: str, data: List[Dict[str, Any]]):
+    """Saves monitoring results to the JSON file."""
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    try:
+        with open(filepath, 'w') as f:
+            json.dump(data, f, indent=2)
+        logger.info(f"Results saved to {filepath}")
+    except IOError as e:
+        logger.error(f"Error saving results to {filepath}: {e}")
+
+def generate_graphs(results: List[Dict[str, Any]]):
+    """Generates and saves analysis graphs."""
+    if not results:
+        logger.warning("No results to analyze, skipping graph generation.")
+        return
+
+    os.makedirs(ANALYSIS_DIR, exist_ok=True)
+
+    # --- Prepare data ---
+    timestamps = [datetime.fromisoformat(r['timestamp']) for r in results]
     
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    filename = f"{output_dir}/pds_monitor_{timestamp}.json"
+    # Uptime data (based on describe_server)
+    uptime_statuses = [1 if r['results'][0]['status'] == 'success' else 0 for r in results]
+    response_times = [r['results'][0]['response_time'] for r in results]
+
+    # Endpoint success rates
+    endpoint_stats = {}
+    for result in results:
+        for check in result['results']:
+            endpoint = check['endpoint']
+            if endpoint not in endpoint_stats:
+                endpoint_stats[endpoint] = {'success': 0, 'total': 0}
+            endpoint_stats[endpoint]['total'] += 1
+            if check['status'] == 'success':
+                endpoint_stats[endpoint]['success'] += 1
+
+    # --- Uptime Graph ---
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+    fig.suptitle(f'PDS Uptime and Response Time ({PDS_URL})', fontsize=16)
     
-    with open(filename, 'w') as f:
-        json.dump(results, f, indent=2)
+    ax1.plot(timestamps, uptime_statuses, 'g-', marker='o', markersize=4, linestyle='-', label="Uptime (1=OK)")
+    ax1.set_ylabel('Status')
+    ax1.set_ylim(-0.1, 1.1)
+    ax1.grid(True, which='both', linestyle='--', linewidth=0.5)
+    ax1.legend()
+
+    ax2.plot(timestamps, response_times, 'b-', marker='o', markersize=4, linestyle='-', label="Response Time (s)")
+    ax2.set_ylabel('Response Time (s)')
+    ax2.set_xlabel('Time')
+    ax2.grid(True, which='both', linestyle='--', linewidth=0.5)
+    ax2.legend()
+
+    ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d\n%H:%M'))
+    plt.xticks(rotation=45)
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    uptime_graph_path = os.path.join(ANALYSIS_DIR, "uptime_graph.png")
+    plt.savefig(uptime_graph_path)
+    logger.info(f"Uptime graph saved to {uptime_graph_path}")
+    plt.close()
+
+    # --- Endpoint Success Rate Graph ---
+    endpoints = list(endpoint_stats.keys())
+    success_rates = [(endpoint_stats[e]['success'] / endpoint_stats[e]['total']) * 100 for e in endpoints]
     
-    logger.info(f"Results saved to {filename}")
-    return filename
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars = ax.bar(endpoints, success_rates, color='skyblue')
+    ax.set_ylabel('Success Rate (%)')
+    ax.set_title(f'Endpoint Success Rates ({PDS_URL})')
+    ax.set_ylim(0, 100)
+    plt.xticks(rotation=45, ha='right')
+
+    for bar in bars:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.1f}%', ha='center', va='bottom')
+
+    plt.tight_layout()
+    endpoint_graph_path = os.path.join(ANALYSIS_DIR, "endpoint_analysis.png")
+    plt.savefig(endpoint_graph_path)
+    logger.info(f"Endpoint analysis graph saved to {endpoint_graph_path}")
+    plt.close()
+
 
 def main():
-    """Main function"""
-    # Create monitor instance
-    monitor = PDSMonitor(PDS_URL, USER_HANDLE)
+    """Main function to run monitoring and analysis."""
+    monitor = PDSMonitor(PDS_URL, USER_HANDLE, APP_PASSWORD)
     
-    # Run monitoring
-    results = monitor.run_monitoring()
+    # Run the checks
+    check_results = monitor.run_all_checks()
+
+    # Structure the new data point
+    new_data_point = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "pds_url": PDS_URL,
+        "authenticated": bool(monitor.client.me),
+        "results": check_results
+    }
+
+    # Load existing data, append new data, and save
+    all_data = load_results(RESULTS_FILE)
+    all_data.append(new_data_point)
+    save_results(RESULTS_FILE, all_data)
     
-    # Save results
-    filename = save_results(results)
-    
+    # Generate new graphs
+    generate_graphs(all_data)
+
     # Print summary
-    summary = results['summary']
-    print(f"\n=== PDS Monitoring Summary ===")
+    successful_checks = sum(1 for r in check_results if r['status'] == 'success')
+    total_checks = len(check_results)
+    logger.info(f"Monitoring complete. {successful_checks}/{total_checks} checks successful.")
+    print("\n=== PDS Monitoring Summary ===")
     print(f"PDS URL: {PDS_URL}")
-    print(f"User Handle: {USER_HANDLE}")
-    print(f"Timestamp: {results['timestamp']}")
-    print(f"PDS Status: {'🟢 Online' if summary['pds_online'] else '🔴 Offline'}")
-    print(f"AT Protocol Requests: {summary['successful_requests']}/{summary['total_requests']} successful ({summary['success_rate']}%)")
-    print(f"Results saved to: {filename}")
-    
-    # Print detailed results
-    print(f"\n=== Detailed Results ===")
-    for request in results['atproto_requests']:
-        status_emoji = "🟢" if request['status'] == 'success' else "🔴"
-        print(f"{status_emoji} {request['endpoint']}: {request['status']} ({request['response_code']})")
-    
-    return results
+    print(f"Authenticated: {'Yes' if new_data_point['authenticated'] else 'No'}")
+    print(f"Timestamp: {new_data_point['timestamp']}")
+    for res in new_data_point['results']:
+        status_emoji = "🟢" if res['status'] == 'success' else "🔴"
+        print(f"  {status_emoji} {res['endpoint']}: {res['status']} ({res['response_time']}s)")
+
 
 if __name__ == "__main__":
     main()
