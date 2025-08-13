@@ -1,0 +1,111 @@
+{
+  "timestamp": "2025-08-13T21:01:30.102880+00:00",
+  "pds_url": "https://jglypt.net",
+  "user_handle": "@j4ck.xyz",
+  "pds_status": {
+    "timestamp": "2025-08-13T20:59:52.890939+00:00",
+    "pds_url": "https://jglypt.net",
+    "status": "offline",
+    "response_time": null,
+    "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+    "details": {}
+  },
+  "atproto_requests": [
+    {
+      "timestamp": "2025-08-13T21:00:03.044942+00:00",
+      "endpoint": "server_describe",
+      "url": "https://jglypt.net/xrpc/com.atproto.server.describeServer",
+      "status": "success",
+      "response_time": 5.634,
+      "error": null,
+      "response_code": 200
+    },
+    {
+      "timestamp": "2025-08-13T21:00:08.678856+00:00",
+      "endpoint": "server_health",
+      "url": "https://jglypt.net/xrpc/com.atproto.server.getHealth",
+      "status": "unauthorized",
+      "response_time": 0.46,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T21:00:09.138405+00:00",
+      "endpoint": "get_profile",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getProfile",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    },
+    {
+      "timestamp": "2025-08-13T21:00:19.150277+00:00",
+      "endpoint": "get_author_feed",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getAuthorFeed",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    },
+    {
+      "timestamp": "2025-08-13T21:00:29.285393+00:00",
+      "endpoint": "get_suggestions",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getSuggestions",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    },
+    {
+      "timestamp": "2025-08-13T21:00:39.418313+00:00",
+      "endpoint": "search_posts",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.searchPosts",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    },
+    {
+      "timestamp": "2025-08-13T21:00:49.553911+00:00",
+      "endpoint": "get_follows",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getFollows",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    },
+    {
+      "timestamp": "2025-08-13T21:00:59.677124+00:00",
+      "endpoint": "get_followers",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getFollowers",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    },
+    {
+      "timestamp": "2025-08-13T21:01:09.812129+00:00",
+      "endpoint": "get_lists",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getLists",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    },
+    {
+      "timestamp": "2025-08-13T21:01:19.973933+00:00",
+      "endpoint": "get_popular",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getPopular",
+      "status": "failed",
+      "response_time": null,
+      "error": "HTTPSConnectionPool(host='jglypt.net', port=443): Read timed out. (read timeout=10)",
+      "response_code": null
+    }
+  ],
+  "summary": {
+    "total_requests": 10,
+    "successful_requests": 1,
+    "success_rate": 10.0,
+    "pds_online": false
+  }
+}
