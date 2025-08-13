@@ -1,0 +1,18 @@
+PDS Monitoring Summary Report
+==================================================
+
+Total monitoring checks: 3
+Online checks: 3
+Overall uptime: 100.00%
+
+Average response time: 0.370 seconds
+
+Total AT Protocol requests: 50
+Successful requests: 1
+Overall success rate: 2.00%
+
+Latest Check:
+  Timestamp: 2025-08-13T20:56:49.465020+00:00
+  PDS Status: online
+  Response Time: 0.229 seconds
+  AT Protocol Success Rate: 10.0%

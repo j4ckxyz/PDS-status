@@ -1,0 +1,207 @@
+{
+  "timestamp": "2025-08-13T20:53:15.727604",
+  "pds_url": "https://jglypt.net",
+  "user_handle": "@j4ck.xyz",
+  "pds_status": {
+    "timestamp": "2025-08-13T20:53:12.843117",
+    "pds_url": "https://jglypt.net",
+    "status": "online",
+    "response_time": 0.413,
+    "error": null,
+    "details": {
+      "available_user_domains": [
+        ".jglypt.net"
+      ],
+      "invite_code_required": true,
+      "links": {}
+    }
+  },
+  "atproto_requests": [
+    {
+      "timestamp": "2025-08-13T20:53:13.256839",
+      "endpoint": "get_profile",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getProfile",
+      "status": "unauthorized",
+      "response_time": 0.088,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:13.345333",
+      "endpoint": "get_author_feed",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getAuthorFeed",
+      "status": "unauthorized",
+      "response_time": 0.099,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:13.444228",
+      "endpoint": "get_timeline",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getTimeline",
+      "status": "unauthorized",
+      "response_time": 0.091,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:13.535488",
+      "endpoint": "get_post_thread",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getPostThread",
+      "status": "unauthorized",
+      "response_time": 0.088,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:13.623070",
+      "endpoint": "get_notifications",
+      "url": "https://jglypt.net/xrpc/app.bsky.notification.listNotifications",
+      "status": "unauthorized",
+      "response_time": 0.098,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:13.721123",
+      "endpoint": "get_suggestions",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getSuggestions",
+      "status": "unauthorized",
+      "response_time": 0.218,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:13.938880",
+      "endpoint": "search_posts",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.searchPosts",
+      "status": "unauthorized",
+      "response_time": 0.201,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:14.139715",
+      "endpoint": "get_follows",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getFollows",
+      "status": "unauthorized",
+      "response_time": 0.297,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:14.436463",
+      "endpoint": "get_followers",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getFollowers",
+      "status": "unauthorized",
+      "response_time": 0.091,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:14.527852",
+      "endpoint": "get_likes",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getLikes",
+      "status": "unauthorized",
+      "response_time": 0.103,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:14.630824",
+      "endpoint": "get_reposts",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getRepostedBy",
+      "status": "unauthorized",
+      "response_time": 0.232,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:14.863285",
+      "endpoint": "get_blocks",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getBlocks",
+      "status": "unauthorized",
+      "response_time": 0.117,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:14.980295",
+      "endpoint": "get_mutes",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getMutes",
+      "status": "unauthorized",
+      "response_time": 0.095,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:15.075807",
+      "endpoint": "get_list",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getList",
+      "status": "unauthorized",
+      "response_time": 0.095,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:15.170882",
+      "endpoint": "get_lists",
+      "url": "https://jglypt.net/xrpc/app.bsky.graph.getLists",
+      "status": "unauthorized",
+      "response_time": 0.086,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:15.256564",
+      "endpoint": "get_bookmarks",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getBookmarks",
+      "status": "unauthorized",
+      "response_time": 0.086,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:15.343037",
+      "endpoint": "get_preferences",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getPreferences",
+      "status": "unauthorized",
+      "response_time": 0.086,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:15.428707",
+      "endpoint": "get_suggested_follows",
+      "url": "https://jglypt.net/xrpc/app.bsky.actor.getSuggestions",
+      "status": "unauthorized",
+      "response_time": 0.097,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:15.526169",
+      "endpoint": "get_popular",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getPopular",
+      "status": "unauthorized",
+      "response_time": 0.111,
+      "error": null,
+      "response_code": 401
+    },
+    {
+      "timestamp": "2025-08-13T20:53:15.636934",
+      "endpoint": "get_trending",
+      "url": "https://jglypt.net/xrpc/app.bsky.feed.getTrending",
+      "status": "unauthorized",
+      "response_time": 0.09,
+      "error": null,
+      "response_code": 401
+    }
+  ],
+  "summary": {
+    "total_requests": 20,
+    "successful_requests": 0,
+    "success_rate": 0.0,
+    "pds_online": true
+  }
+}

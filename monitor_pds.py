@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-AT Protocol PDS Status Monitor
+AT Protocol PDS Status Monitor - Simple Version
 
 This script monitors the status of an AT Protocol Personal Data Server (PDS)
-and performs various AT Protocol requests to test functionality.
+and performs basic AT Protocol requests that don't require authentication.
 
 Configuration:
 - PDS_URL: The URL of your PDS (default: https://jglypt.net)
 - USER_HANDLE: Your AT Protocol handle (default: @j4ck.xyz)
 
 Usage:
-    python monitor_pds.py
+    python monitor_pds_simple.py
 """
 
 import requests
 import json
 import time
 import os
-from datetime import datetime
-from typing import Dict, List, Any, Optional
+from datetime import datetime, timezone
+from typing import Dict, List, Any
 import logging
 
 # Configuration - Change these values for your PDS
@@ -42,7 +42,7 @@ class PDSMonitor:
     def check_pds_status(self) -> Dict[str, Any]:
         """Check basic PDS status and health"""
         result = {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'pds_url': self.pds_url,
             'status': 'unknown',
             'response_time': None,
@@ -79,11 +79,21 @@ class PDSMonitor:
         return result
     
     def perform_atproto_requests(self) -> List[Dict[str, Any]]:
-        """Perform various AT Protocol requests to test functionality"""
+        """Perform basic AT Protocol requests that don't require authentication"""
         requests_results = []
         
-        # List of AT Protocol endpoints to test
+        # Only test endpoints that should work without authentication
         endpoints = [
+            {
+                'name': 'server_describe',
+                'url': f"{self.pds_url}/xrpc/com.atproto.server.describeServer",
+                'params': {}
+            },
+            {
+                'name': 'server_health',
+                'url': f"{self.pds_url}/xrpc/com.atproto.server.getHealth",
+                'params': {}
+            },
             {
                 'name': 'get_profile',
                 'url': f"{self.pds_url}/xrpc/app.bsky.actor.getProfile",
@@ -93,21 +103,6 @@ class PDSMonitor:
                 'name': 'get_author_feed',
                 'url': f"{self.pds_url}/xrpc/app.bsky.feed.getAuthorFeed",
                 'params': {'actor': self.user_handle, 'limit': 5}
-            },
-            {
-                'name': 'get_timeline',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getTimeline",
-                'params': {'limit': 5}
-            },
-            {
-                'name': 'get_post_thread',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getPostThread",
-                'params': {'uri': f"at://did:plc:example/app.bsky.feed.post/123"}
-            },
-            {
-                'name': 'get_notifications',
-                'url': f"{self.pds_url}/xrpc/app.bsky.notification.listNotifications",
-                'params': {'limit': 5}
             },
             {
                 'name': 'get_suggestions',
@@ -130,64 +125,20 @@ class PDSMonitor:
                 'params': {'actor': self.user_handle, 'limit': 5}
             },
             {
-                'name': 'get_likes',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getLikes",
-                'params': {'uri': f"at://did:plc:example/app.bsky.feed.post/123", 'limit': 5}
-            },
-            {
-                'name': 'get_reposts',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getRepostedBy",
-                'params': {'uri': f"at://did:plc:example/app.bsky.feed.post/123", 'limit': 5}
-            },
-            {
-                'name': 'get_blocks',
-                'url': f"{self.pds_url}/xrpc/app.bsky.graph.getBlocks",
-                'params': {'limit': 5}
-            },
-            {
-                'name': 'get_mutes',
-                'url': f"{self.pds_url}/xrpc/app.bsky.graph.getMutes",
-                'params': {'limit': 5}
-            },
-            {
-                'name': 'get_list',
-                'url': f"{self.pds_url}/xrpc/app.bsky.graph.getList",
-                'params': {'list': 'at://did:plc:example/app.bsky.graph.list/123'}
-            },
-            {
                 'name': 'get_lists',
                 'url': f"{self.pds_url}/xrpc/app.bsky.graph.getLists",
                 'params': {'actor': self.user_handle, 'limit': 5}
             },
             {
-                'name': 'get_bookmarks',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getBookmarks",
-                'params': {'limit': 5}
-            },
-            {
-                'name': 'get_preferences',
-                'url': f"{self.pds_url}/xrpc/app.bsky.actor.getPreferences"
-            },
-            {
-                'name': 'get_suggested_follows',
-                'url': f"{self.pds_url}/xrpc/app.bsky.actor.getSuggestions",
-                'params': {'limit': 5}
-            },
-            {
                 'name': 'get_popular',
                 'url': f"{self.pds_url}/xrpc/app.bsky.feed.getPopular",
-                'params': {'limit': 5}
-            },
-            {
-                'name': 'get_trending',
-                'url': f"{self.pds_url}/xrpc/app.bsky.feed.getTrending",
                 'params': {'limit': 5}
             }
         ]
         
         for endpoint in endpoints:
             result = {
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'endpoint': endpoint['name'],
                 'url': endpoint['url'],
                 'status': 'unknown',
@@ -237,7 +188,7 @@ class PDSMonitor:
         
         # Compile final results
         monitoring_result = {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'pds_url': self.pds_url,
             'user_handle': self.user_handle,
             'pds_status': status_result,
@@ -256,7 +207,7 @@ def save_results(results: Dict[str, Any], output_dir: str = "results"):
     """Save monitoring results to file"""
     os.makedirs(output_dir, exist_ok=True)
     
-    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     filename = f"{output_dir}/pds_monitor_{timestamp}.json"
     
     with open(filename, 'w') as f:
@@ -285,6 +236,12 @@ def main():
     print(f"PDS Status: {'🟢 Online' if summary['pds_online'] else '🔴 Offline'}")
     print(f"AT Protocol Requests: {summary['successful_requests']}/{summary['total_requests']} successful ({summary['success_rate']}%)")
     print(f"Results saved to: {filename}")
+    
+    # Print detailed results
+    print(f"\n=== Detailed Results ===")
+    for request in results['atproto_requests']:
+        status_emoji = "🟢" if request['status'] == 'success' else "🔴"
+        print(f"{status_emoji} {request['endpoint']}: {request['status']} ({request['response_code']})")
     
     return results
 
