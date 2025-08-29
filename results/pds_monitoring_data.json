@@ -18506,5 +18506,33 @@
         "error": "AppBskyFeedNamespace.get_author_feed() missing 1 required positional argument: 'params'"
       }
     ]
+  },
+  {
+    "timestamp": "2025-08-29T09:38:04.331433+00:00",
+    "pds_url": "https://jglypt.net",
+    "authenticated": false,
+    "results": [
+      {
+        "endpoint": "describe_server",
+        "status": "success",
+        "response_time": 0.152,
+        "response_code": null,
+        "error": null
+      },
+      {
+        "endpoint": "get_profile",
+        "status": "failed",
+        "response_time": 0.0,
+        "response_code": null,
+        "error": "AppBskyActorNamespace.get_profile() missing 1 required positional argument: 'params'"
+      },
+      {
+        "endpoint": "get_author_feed",
+        "status": "failed",
+        "response_time": 0.0,
+        "response_code": null,
+        "error": "AppBskyFeedNamespace.get_author_feed() missing 1 required positional argument: 'params'"
+      }
+    ]
   }
 ]
